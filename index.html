@@ -87,6 +87,14 @@
   .thumb .shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%); transform: translateX(-100%); transition: transform .8s ease; }
   .card:hover .shine { transform: translateX(100%); }
   .badge { position: absolute; top: 12px; left: 12px; background: rgba(12, 20, 23, .78); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 5px 10px; border-radius: 999px; backdrop-filter: blur(4px); }
+  .card.talk .thumb img { object-fit: contain; object-position: center; background: #fff; }
+  .badge.deck { left: auto; right: 12px; background: var(--accent); }
+  .strip { position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%); display: none; gap: 6px; max-width: 92%; overflow-x: auto; padding: 6px; background: rgba(0,0,0,.45); border-radius: 10px; }
+  .strip.on { display: flex; }
+  .stage.deck #lb-img { max-height: calc(92vh - 110px); margin-bottom: 84px; }
+  @media (max-width: 820px) { .stage.deck #lb-img { max-height: calc(58vh - 90px); margin-bottom: 70px; } }
+  .strip img { width: 72px; height: 40px; object-fit: cover; border-radius: 4px; opacity: .5; cursor: pointer; border: 2px solid transparent; box-shadow: none; max-width: none; max-height: none; transition: opacity .2s; }
+  .strip img.cur { opacity: 1; border-color: var(--accent); }
   .badge.soon { left: auto; right: 12px; background: var(--accent-2); }
   .body { padding: 16px 18px 18px; }
   .meta { font-size: 12px; color: var(--accent-2); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
@@ -131,13 +139,14 @@
 <body>
 
 <header class="hero">
-  <div class="eyebrow">Poster gallery</div>
+  <div class="eyebrow">Poster &amp; talk gallery</div>
   <h1>Hearing, language &amp; the mind, one poster at a time</h1>
-  <p class="lede">Conference posters by <a href="https://github.com/amy95031">Chia-Yu (Millie) Liu</a> on hearing loss, dementia, child language, and cognition, presented in Prague, Seattle, Rome, and Sapporo.</p>
+  <p class="lede">Conference posters and talks by <a href="https://github.com/amy95031">Chia-Yu (Millie) Liu</a> on hearing loss, dementia, child language, and cognition, presented in Washington DC, Prague, Seattle, Rome, and Sapporo.</p>
   <div class="stats">
-    <div class="stat"><b id="n-posters">7</b><span>posters</span></div>
-    <div class="stat"><b>4</b><span>international meetings</span></div>
-    <div class="stat"><b>2024–26</b><span>years</span></div>
+    <div class="stat"><b id="n-posters">8</b><span>posters</span></div>
+    <div class="stat"><b>1</b><span>oral talk</span></div>
+    <div class="stat"><b>5</b><span>international meetings</span></div>
+    <div class="stat"><b>2023–26</b><span>years</span></div>
   </div>
 </header>
 
@@ -161,6 +170,7 @@
     <img id="lb-img" alt="" />
     <button class="nav prev" id="prev" aria-label="Previous poster">‹</button>
     <button class="nav next" id="next" aria-label="Next poster">›</button>
+    <div class="strip" id="strip"></div>
     <div class="counter" id="counter"></div>
   </div>
   <aside class="info">
@@ -201,6 +211,14 @@ const POSTERS = [
     summary: "Many advanced theory-of-mind tasks depend on reading. This Mandarin video-based task was piloted with 88 adolescents with typical hearing, hearing loss, or autism; item analysis retained 21 of 32 tasks across false belief, implied meaning, and social faux pas. (Participant images blurred for privacy.)"
   },
   {
+    id: "iced2025-oral-tom",
+    title: "A Longitudinal Study on Theory of Mind Development in Children with Hearing Loss and Children with Typical Hearing",
+    authors: "Hsiu-Tan Liu, Chun-Jung Liu, Chia-Yu Liu",
+    meeting: "ICED 2025", place: "Rome, Italy", year: 2025, type: "Oral presentation #172", slides: 22,
+    topics: ["Talks", "Hearing loss", "Child language", "Theory of mind", "Longitudinal"],
+    summary: "111 Mandarin-speaking children (53 with hearing loss, 58 with typical hearing) were followed with five theory-of-mind assessments. Children with hearing loss started lower but grew at a similar rate, with no widening gap, and more than 80% of both groups followed the same developmental sequence."
+  },
+  {
     id: "iced2025-unilateral-hearing-loss",
     title: "Unseen Struggles: The Hidden Mental Health Toll of Unilateral Hearing Loss",
     authors: "Ting-Hui Liu, Chia-Yu Liu",
@@ -231,6 +249,14 @@ const POSTERS = [
     meeting: "ICP 2024", place: "Prague, Czech Republic", year: 2024, type: "Poster",
     topics: ["Hearing loss", "Child language", "Theory of mind", "Longitudinal"],
     summary: "54 children with hearing loss and 72 with typical hearing were assessed every six months for three years. Despite early intervention, children with hearing loss continued to lag in theory of mind; the starting age and frequency of parent–child shared reading predicted performance."
+  },
+  {
+    id: "apa2023-tom-sequence-taiwan",
+    title: "Cultural-specific or Cross-cultural? The Sequence of Theory-of-Mind in Taiwanese Children",
+    authors: "Hsiu-Tan Liu, Ting-Hui Liu, Chun-Jung Liu, Chia-Yu Liu",
+    meeting: "APA 2023", place: "Washington, DC, USA", year: 2023, type: "Poster",
+    topics: ["Child language", "Theory of mind"],
+    summary: "Theory-of-mind tasks given to 67 Taiwanese preschoolers formed a Guttman scale (coefficient of reproducibility .94). False belief and hidden emotion were hardest, as in other cultures, while the order of earlier steps varied, a pattern the authors linked to cultural individualism."
   }
 ];
 
@@ -242,7 +268,7 @@ let visible = POSTERS.slice();
 let current = 0;
 
 /* Filters */
-const topics = ["All", "Upcoming", "Dementia", "Hearing loss", "Real-world data", "Meta-analysis", "Child language", "Generative AI"];
+const topics = ["All", "Upcoming", "Talks", "Dementia", "Hearing loss", "Real-world data", "Meta-analysis", "Child language", "Generative AI"];
 topics.forEach(t => {
   const b = document.createElement("button");
   b.className = "chip"; b.type = "button"; b.textContent = t;
@@ -254,12 +280,12 @@ topics.forEach(t => {
 /* Cards */
 POSTERS.forEach((p, i) => {
   const c = document.createElement("article");
-  c.className = "card"; c.tabIndex = 0; c.dataset.id = p.id;
+  c.className = "card" + (p.slides ? " talk" : ""); c.tabIndex = 0; c.dataset.id = p.id;
   c.innerHTML = `
     <div class="thumb">
       <img src="thumbs/${p.id}.jpg" alt="Poster: ${p.title}" loading="lazy" />
       <div class="shine"></div>
-      <span class="badge">${p.meeting}</span>${p.upcoming ? '<span class="badge soon">Upcoming</span>' : ""}
+      <span class="badge">${p.meeting}</span>${p.upcoming ? '<span class="badge soon">Upcoming</span>' : ""}${p.slides ? `<span class="badge deck">▶ ${p.slides} slides</span>` : ""}
     </div>
     <div class="body">
       <div class="meta">${p.type} · ${p.place}</div>
@@ -277,6 +303,11 @@ POSTERS.forEach((p, i) => {
     c.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
   };
   c.onmouseleave = () => { c.style.transform = ""; };
+  if (p.slides) {
+    const im = c.querySelector(".thumb img"); let t = null, k = 1;
+    c.addEventListener("mouseenter", () => { t = setInterval(() => { k = k % p.slides + 1; im.src = slideSrc(p, k); }, 900); });
+    c.addEventListener("mouseleave", () => { clearInterval(t); k = 1; im.src = `thumbs/${p.id}.jpg`; });
+  }
   grid.appendChild(c);
 });
 
@@ -300,23 +331,47 @@ function applyFilter() {
 const lb = document.getElementById("lb"), stage = document.getElementById("stage"), img = document.getElementById("lb-img");
 function openLb(id) {
   current = visible.findIndex(p => p.id === id);
+  slide = 1;
   render(); lb.classList.add("open"); document.body.style.overflow = "hidden";
   document.getElementById("close").focus();
 }
 function closeLb() { lb.classList.remove("open"); unzoom(); document.body.style.overflow = ""; }
+let slide = 1;
+function slideSrc(p, k) { return `talks/${p.id}/${String(k).padStart(2, "0")}.jpg`; }
 function render() {
   const p = visible[current];
   unzoom();
-  img.src = `posters/${p.id}.jpg`; img.alt = `Poster: ${p.title}`;
+  img.src = p.slides ? slideSrc(p, slide) : `posters/${p.id}.jpg`; img.alt = `Poster: ${p.title}`;
   document.getElementById("lb-meta").textContent = `${p.type} · ${p.meeting} · ${p.place}`;
   document.getElementById("lb-title").textContent = p.title;
   document.getElementById("lb-authors").textContent = p.authors;
   document.getElementById("lb-summary").textContent = p.summary;
   document.getElementById("lb-tags").innerHTML = p.topics.map(t => `<span class="tag">${t}</span>`).join("");
   document.getElementById("lb-open").href = `posters/${p.id}.jpg`;
-  document.getElementById("counter").textContent = `${current + 1} / ${visible.length}`;
+  document.getElementById("counter").textContent = p.slides
+    ? `Slide ${slide} / ${p.slides}  ·  item ${current + 1} / ${visible.length}`
+    : `${current + 1} / ${visible.length}`;
+  document.getElementById("lb-open").href = img.src;
+  const strip = document.getElementById("strip");
+  strip.classList.toggle("on", !!p.slides);
+  stage.classList.toggle("deck", !!p.slides);
+  if (p.slides) {
+    if (strip.dataset.id !== p.id) {
+      strip.innerHTML = Array.from({ length: p.slides }, (_, i) => `<img src="${slideSrc(p, i + 1)}" alt="Slide ${i + 1}" data-k="${i + 1}" />`).join("");
+      strip.dataset.id = p.id;
+      strip.querySelectorAll("img").forEach(t => t.onclick = e => { e.stopPropagation(); slide = +t.dataset.k; render(); });
+    }
+    strip.querySelectorAll("img").forEach(t => t.classList.toggle("cur", +t.dataset.k === slide));
+    strip.querySelector(".cur")?.scrollIntoView({ inline: "center", block: "nearest" });
+  }
 }
-function step(d) { current = (current + d + visible.length) % visible.length; render(); }
+function step(d) {
+  const p = visible[current];
+  if (p.slides && slide + d >= 1 && slide + d <= p.slides) { slide += d; render(); return; }
+  current = (current + d + visible.length) % visible.length;
+  const q = visible[current]; slide = q.slides ? (d < 0 ? q.slides : 1) : 1;
+  render();
+}
 function unzoom() { stage.classList.remove("zoomed"); img.style.transform = ""; }
 img.onclick = e => {
   e.stopPropagation();
