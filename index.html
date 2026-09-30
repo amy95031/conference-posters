@@ -87,6 +87,7 @@
   .thumb .shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%); transform: translateX(-100%); transition: transform .8s ease; }
   .card:hover .shine { transform: translateX(100%); }
   .badge { position: absolute; top: 12px; left: 12px; background: rgba(12, 20, 23, .78); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 5px 10px; border-radius: 999px; backdrop-filter: blur(4px); }
+  .badge.soon { left: auto; right: 12px; background: var(--accent-2); }
   .body { padding: 16px 18px 18px; }
   .meta { font-size: 12px; color: var(--accent-2); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
   .card h3 { font-size: 16px; line-height: 1.35; margin: 6px 0 8px; }
@@ -132,11 +133,11 @@
 <header class="hero">
   <div class="eyebrow">Poster gallery</div>
   <h1>Hearing, language &amp; the mind, one poster at a time</h1>
-  <p class="lede">Conference posters by <a href="https://github.com/amy95031">Chia-Yu (Millie) Liu</a> on hearing loss, child language, and cognition, presented in Prague, Seattle, and Rome.</p>
+  <p class="lede">Conference posters by <a href="https://github.com/amy95031">Chia-Yu (Millie) Liu</a> on hearing loss, dementia, child language, and cognition, presented in Prague, Seattle, Rome, and Sapporo.</p>
   <div class="stats">
-    <div class="stat"><b id="n-posters">4</b><span>posters</span></div>
-    <div class="stat"><b>3</b><span>international meetings</span></div>
-    <div class="stat"><b>2024–25</b><span>years</span></div>
+    <div class="stat"><b id="n-posters">7</b><span>posters</span></div>
+    <div class="stat"><b>4</b><span>international meetings</span></div>
+    <div class="stat"><b>2024–26</b><span>years</span></div>
   </div>
 </header>
 
@@ -175,6 +176,30 @@
 
 <script>
 const POSTERS = [
+  {
+    id: "wcap2026-dora-dementia",
+    title: "Risk of Falls and Delirium Associated with Dual Orexin Receptor Antagonists Versus Benzodiazepines in Older Adults with Dementia",
+    authors: "Ting-Hui Liu, Chia-Yu Liu, Hsiu-Tan Liu, Chun-Jung Liu",
+    meeting: "WCAP 2026", place: "Sapporo, Japan", year: 2026, type: "Poster · 6–8 Oct 2026", upcoming: true,
+    topics: ["Dementia", "Real-world data", "Sleep"],
+    summary: "A propensity-matched TriNetX cohort of older adults with dementia and insomnia. Starting a dual orexin receptor antagonist was associated with lower 12-month hazards of falls and delirium than starting a benzodiazepine or Z-drug; mortality was inconclusive. Observational data cannot establish causality."
+  },
+  {
+    id: "wcap2026-laughter-therapy",
+    title: "Effects of Laughter Therapy on Depression and Anxiety: Dose-response Meta-analysis with Trial Sequential Analysis",
+    authors: "Chia-Yu Liu, Ting-Hui Liu, Hsiu-Tan Liu, Chun-Jung Liu",
+    meeting: "WCAP 2026", place: "Sapporo, Japan", year: 2026, type: "Poster · 6–8 Oct 2026", upcoming: true,
+    topics: ["Meta-analysis", "Mental health"],
+    summary: "Across 18 randomized trials, laughter-inducing programmes reduced depression and anxiety, with benefit rising with cumulative treatment time before an estimated plateau. High heterogeneity and very low GRADE certainty mean it is best seen as an adjunct to established care."
+  },
+  {
+    id: "wcap2026-advanced-tom",
+    title: "Reducing Linguistic Bias in Advanced Theory-of-Mind Assessment: A Mandarin Video-based Assessment for Adolescents",
+    authors: "Chia-Yu Liu, Hsiu-Tan Liu, Chun-Jung Liu, Ting-Hui Liu",
+    meeting: "WCAP 2026", place: "Sapporo, Japan", year: 2026, type: "Poster · 6–8 Oct 2026", upcoming: true,
+    topics: ["Hearing loss", "Child language", "Theory of mind"],
+    summary: "Many advanced theory-of-mind tasks depend on reading. This Mandarin video-based task was piloted with 88 adolescents with typical hearing, hearing loss, or autism; item analysis retained 21 of 32 tasks across false belief, implied meaning, and social faux pas. (Participant images blurred for privacy.)"
+  },
   {
     id: "iced2025-unilateral-hearing-loss",
     title: "Unseen Struggles: The Hidden Mental Health Toll of Unilateral Hearing Loss",
@@ -217,7 +242,7 @@ let visible = POSTERS.slice();
 let current = 0;
 
 /* Filters */
-const topics = ["All", "Hearing loss", "Real-world data", "Meta-analysis", "Child language", "Generative AI"];
+const topics = ["All", "Upcoming", "Dementia", "Hearing loss", "Real-world data", "Meta-analysis", "Child language", "Generative AI"];
 topics.forEach(t => {
   const b = document.createElement("button");
   b.className = "chip"; b.type = "button"; b.textContent = t;
@@ -234,7 +259,7 @@ POSTERS.forEach((p, i) => {
     <div class="thumb">
       <img src="thumbs/${p.id}.jpg" alt="Poster: ${p.title}" loading="lazy" />
       <div class="shine"></div>
-      <span class="badge">${p.meeting}</span>
+      <span class="badge">${p.meeting}</span>${p.upcoming ? '<span class="badge soon">Upcoming</span>' : ""}
     </div>
     <div class="body">
       <div class="meta">${p.type} · ${p.place}</div>
@@ -262,7 +287,7 @@ const io = new IntersectionObserver(es => es.forEach((e, k) => {
 document.querySelectorAll(".card").forEach(c => io.observe(c));
 
 function applyFilter() {
-  visible = POSTERS.filter(p => active === "All" || p.topics.includes(active));
+  visible = POSTERS.filter(p => active === "All" || (active === "Upcoming" ? p.upcoming : p.topics.includes(active)));
   document.querySelectorAll(".chip:not(.theme)").forEach(b => b.setAttribute("aria-pressed", b.textContent === active));
   document.querySelectorAll(".card").forEach(c => {
     const show = visible.some(p => p.id === c.dataset.id);
